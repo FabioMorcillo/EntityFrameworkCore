@@ -543,7 +543,20 @@ namespace Microsoft.EntityFrameworkCore.Query.Sql
         /// </summary>
         /// <param name="projection"> The projection expression. </param>
         protected virtual void GenerateProjection([NotNull] Expression projection)
-            => Visit(ApplyOptimizations(projection, searchCondition: false));
+        {
+            var optimizedProjection = ApplyOptimizations(projection, searchCondition: false);
+            optimizedProjection = ApplyProviderSpecificProjectionOptimizations(optimizedProjection);
+
+            Visit(optimizedProjection);
+        }
+
+        /// <summary>
+        ///     Applies provider specific projection optimizations.
+        /// </summary>
+        /// <param name="projection">Expression to apply optimizations on. </param>
+        /// <returns>Expression after optimizations have been applied. </returns>
+        protected virtual Expression ApplyProviderSpecificProjectionOptimizations(Expression projection)
+            => projection;
 
         /// <summary>
         ///     Visit the predicate in SQL WHERE clause
